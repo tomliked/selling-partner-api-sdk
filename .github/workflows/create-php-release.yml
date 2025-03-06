@@ -24,27 +24,39 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Clone Target Repository
+      - name: Checkout Source Repository (selling-partner-api-sdk)
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: true
+          path: selling-partner-api-sdk
+
+      - name: Clone Target Repository (selling-partner-api-php-release)
         run: |
           mkdir -p ~/workspace
           cd ~/workspace
           echo "Cloning selling-partner-api-php-release..."
           git clone --depth=1 https://x-access-token:${{ secrets.TOMLIKED_PAT }}@github.com/amzn/selling-partner-api-php-release.git target-repo || { echo "Git clone failed"; exit 1; }
 
-      - name: Debug Check target-repo
+      - name: Debug: Check php/sdk/ directory
         run: |
-          echo "Checking if target-repo exists..."
-          ls -la ${HOME}/workspace/
-          if [ ! -d "${HOME}/workspace/target-repo" ]; then
-            echo "ERROR: target-repo does not exist!"
-            exit 1
-          fi
-          ls -la ${HOME}/workspace/target-repo
-          ls -la ${HOME}/workspace/target-repo/.git || { echo "ERROR: .git directory is missing!"; exit 1; }
+          echo "Current working directory: $(pwd)"
+          echo "Checking ~/selling-partner-api-sdk/php/sdk/ existence..."
+          ls -la ~/selling-partner-api-sdk/php/
+          ls -la ~/selling-partner-api-sdk/php/sdk/ || echo "ERROR: ~/selling-partner-api-sdk/php/sdk/ does not exist!"
 
-      - name: Sync 'php/sdk/' to Target Repo
+      - name: Ensure 'target-repo/' is Clean Before Sync
         run: |
-          rsync -av --delete php/sdk/ ~/workspace/target-repo/
+          echo "Cleaning target-repo before sync..."
+          rm -rf ~/workspace/target-repo/*
+          ls -la ~/workspace/target-repo/
+
+      - name: Fully Sync 'php/sdk/' to Target Repo
+        run: |
+          echo "Syncing ~/selling-partner-api-sdk/php/sdk/ to ~/workspace/target-repo/..."
+          rsync -av --delete --force ~/selling-partner-api-sdk/php/sdk/ ~/workspace/target-repo/
+          echo "Sync complete. Checking target-repo/"
+          ls -la ~/workspace/target-repo/
 
       - name: Commit and Push Changes
         run: |
