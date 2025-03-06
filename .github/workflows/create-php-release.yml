@@ -41,9 +41,14 @@ jobs:
       - name: Debug Check php/sdk/ directory
         run: |
           echo "Current working directory: $(pwd)"
-          echo "Checking ~/selling-partner-api-sdk/php/sdk/ existence..."
-          ls -la ~/selling-partner-api-sdk/php/
-          ls -la ~/selling-partner-api-sdk/php/sdk/ || echo "ERROR: ~/selling-partner-api-sdk/php/sdk/ does not exist!"
+          find ~/selling-partner-api-sdk -type d | grep "php/sdk" || echo "php/sdk/ not found!"
+          if [ -d "~/selling-partner-api-sdk/php/sdk" ]; then
+            ls -la ~/selling-partner-api-sdk/php/
+            ls -la ~/selling-partner-api-sdk/php/sdk/
+          else
+            echo "ERROR: ~/selling-partner-api-sdk/php/sdk/ does not exist!"
+            exit 1
+          fi
 
       - name: Ensure target-repo is Clean Before Sync
         run: |
