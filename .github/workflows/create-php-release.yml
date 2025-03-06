@@ -16,56 +16,42 @@ on:
 env:
   SDK_VERSION: ${{ github.event.inputs.newVersionNumber }}
 
+concurrency:
+  group: sync-php-sdk-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  sync:
+  clone:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Source Repository (selling-partner-api-sdk)
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Configure Git user
-        run: |
-          git config user.email "tomliked@amazon.co.jp"
-          git config user.name "tomliked"
-
-      - name: Clone Target Repository (selling-partner-api-php-release)
+      - name: Clone Target Repository
         run: |
           mkdir -p ~/workspace
           cd ~/workspace
           git clone --depth=1 https://x-access-token:${{ secrets.TOMLIKED_PAT }}@github.com/amzn/selling-partner-api-php-release.git target-repo
-          cd target-repo
-          git fetch origin
-          git checkout main
-          git reset --hard origin/main
-          git remote set-url origin https://x-access-token:${{ secrets.TOMLIKED_PAT }}@github.com/amzn/selling-partner-api-php-release.git
-          BRANCH_NAME="sync-sdk-${{ env.SDK_VERSION }}-$(date +%Y%m%d-%H%M%S)"
-          git checkout -b "$BRANCH_NAME"
-          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
-          git branch
 
-      - name: Sync `php/sdk/` to Target Repo Root
+  sync:
+    runs-on: ubuntu-latest
+    needs: clone
+    steps:
+      - name: Debug: Check `target-repo`
+        run: |
+          if [ ! -d "~/workspace/target-repo" ]; then
+            echo "ERROR: target-repo does not exist!"
+            exit 1
+          fi
+          ls -la ~/workspace/target-repo
+          ls -la ~/workspace/target-repo/.git || echo "ERROR: .git directory is missing!"
+
+      - name: Sync `php/sdk/` to Target Repo
         run: |
           rsync -av --delete php/sdk/ ~/workspace/target-repo/
-
-      - name: Check for Changes
-        run: |
-          cd ~/workspace/target-repo
-          git status
-          git diff --stat origin/main || true
-
-      - name: Verify Remote URL
-        run: |
-          cd ~/workspace/target-repo
-          git remote -v
 
       - name: Commit and Push Changes
         run: |
           cd ~/workspace/target-repo
           git add -A
           git commit -m "Sync PHP SDK - Version ${{ env.SDK_VERSION }}" || echo "No changes to commit"
-          echo "Current Branch: $(git branch --show-current)"
           git push origin "$(git branch --show-current)"
 
       - name: Create a Pull Request
@@ -80,4 +66,3 @@ jobs:
             This PR syncs the latest changes from `selling-partner-api-sdk/php/sdk/` to `selling-partner-api-php-release/`.
             - Version: ${{ github.event.inputs.newVersionNumber }}
           labels: automated, sdk-sync
-
