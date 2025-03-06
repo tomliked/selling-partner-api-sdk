@@ -50,12 +50,6 @@ jobs:
             exit 1
           fi
 
-      - name: Ensure target-repo is Clean Before Sync
-        run: |
-          echo "Cleaning target-repo before sync..."
-          find ~/workspace/target-repo/ -mindepth 1 -not -name ".git" -exec rm -rf {} +
-          ls -la ~/workspace/target-repo/
-
       - name: Fully Sync php/sdk/ to Target Repo
         run: |
           echo "Syncing selling-partner-api-sdk/php/sdk/ to ~/workspace/target-repo/..."
