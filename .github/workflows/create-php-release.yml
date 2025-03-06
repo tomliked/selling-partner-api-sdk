@@ -38,18 +38,6 @@ jobs:
           echo "Cloning selling-partner-api-php-release..."
           git clone --depth=1 https://x-access-token:${{ secrets.TOMLIKED_PAT }}@github.com/amzn/selling-partner-api-php-release.git target-repo || { echo "Git clone failed"; exit 1; }
 
-      - name: Debug Check php/sdk/ directory
-        run: |
-          echo "Current working directory: $(pwd)"
-          find selling-partner-api-sdk -type d | grep "php/sdk" || echo "php/sdk/ not found!"
-          if [ -d "selling-partner-api-sdk/php/sdk" ]; then
-            ls -la selling-partner-api-sdk/php/
-            ls -la selling-partner-api-sdk/php/sdk/
-          else
-            echo "ERROR: selling-partner-api-sdk/php/sdk/ does not exist!"
-            exit 1
-          fi
-
       - name: Fully Sync php/sdk/ to Target Repo
         run: |
           echo "Syncing selling-partner-api-sdk/php/sdk/ to ~/workspace/target-repo/..."
@@ -57,13 +45,6 @@ jobs:
           echo "Sync complete. Checking target-repo/"
           ls -la ~/workspace/target-repo/
 
-      - name: Ensure .git exists
-        run: |
-          if [ ! -d "/home/runner/workspace/target-repo/.git" ]; then
-            echo "ERROR: .git directory is missing! Reinitializing git..."
-          fi
-
-      
       - name: Commit and Push Changes
         run: |
           cd ~/workspace/target-repo
