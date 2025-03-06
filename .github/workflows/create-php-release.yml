@@ -38,7 +38,7 @@ jobs:
           echo "Cloning selling-partner-api-php-release..."
           git clone --depth=1 https://x-access-token:${{ secrets.TOMLIKED_PAT }}@github.com/amzn/selling-partner-api-php-release.git target-repo || { echo "Git clone failed"; exit 1; }
 
-      - name: Debug: Check php/sdk/ directory
+      - name: Debug Check php/sdk/ directory
         run: |
           echo "Current working directory: $(pwd)"
           echo "Checking ~/selling-partner-api-sdk/php/sdk/ existence..."
