@@ -63,6 +63,14 @@ jobs:
           echo "Sync complete. Checking target-repo/"
           ls -la ~/workspace/target-repo/
 
+      - name: Ensure .git exists
+        run: |
+          if [ ! -d "~/workspace/target-repo/.git" ]; then
+            echo "ERROR: .git directory is missing! Cloning repo again..."
+            rm -rf ~/workspace/target-repo
+            git clone --depth=1 https://x-access-token:${{ secrets.TOMLIKED_PAT }}@github.com/amzn/selling-partner-api-php-release.git ~/workspace/target-repo
+          fi
+      
       - name: Commit and Push Changes
         run: |
           cd ~/workspace/target-repo
@@ -74,17 +82,19 @@ jobs:
           
           git add -A
           git commit -m "Sync PHP SDK - Version ${{ env.SDK_VERSION }}" || echo "No changes to commit"
+          
+          git remote set-url origin https://x-access-token:${{ secrets.TOMLIKED_PAT }}@github.com/amzn/selling-partner-api-php-release.git
           git push origin "$BRANCH_NAME"
-
+      
       - name: Create a Pull Request
         id: create_pr
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.TOMLIKED_PAT }}
-          branch: ${{ env.BRANCH_NAME }}
-          base: main
-          title: "Sync PHP SDK - Version ${{ github.event.inputs.newVersionNumber }}"
-          body: |
-            This PR syncs the latest changes from `selling-partner-api-sdk/php/sdk/` to `selling-partner-api-php-release/`.
-            - Version: ${{ github.event.inputs.newVersionNumber }}
-          labels: automated, sdk-sync
+        run: |
+          cd ~/workspace/target-repo
+          echo "Current directory: $(pwd)"
+          git status || { echo "ERROR: Not in a Git repository!"; exit 1; }
+          gh pr create --title "Sync PHP SDK - Version ${{ env.SDK_VERSION }}" \
+                       --body "This PR syncs the latest changes from \`selling-partner-api-sdk/php/sdk/\` to \`selling-partner-api-php-release/\`." \
+                       --head "${{ env.BRANCH_NAME }}" --base "main"
+        env:
+          GH_TOKEN: ${{ secrets.TOMLIKED_PAT }}
+      
