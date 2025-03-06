@@ -21,38 +21,55 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  clone:
+  sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Clone Target Repository
+      - name: Checkout Source Repository (selling-partner-api-sdk)
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: true
+          path: selling-partner-api-sdk
+
+      - name: Clone Target Repository (selling-partner-api-php-release)
         run: |
           mkdir -p ~/workspace
           cd ~/workspace
-          git clone --depth=1 https://x-access-token:${{ secrets.TOMLIKED_PAT }}@github.com/amzn/selling-partner-api-php-release.git target-repo
+          echo "Cloning selling-partner-api-php-release..."
+          git clone --depth=1 https://x-access-token:${{ secrets.TOMLIKED_PAT }}@github.com/amzn/selling-partner-api-php-release.git target-repo || { echo "Git clone failed"; exit 1; }
 
-  sync:
-    runs-on: ubuntu-latest
-    needs: clone
-    steps:
-      - name: Debug: Check `target-repo`
+      - name: Debug: Check php/sdk/ directory
         run: |
-          if [ ! -d "~/workspace/target-repo" ]; then
-            echo "ERROR: target-repo does not exist!"
-            exit 1
-          fi
-          ls -la ~/workspace/target-repo
-          ls -la ~/workspace/target-repo/.git || echo "ERROR: .git directory is missing!"
+          echo "Current working directory: $(pwd)"
+          echo "Checking ~/selling-partner-api-sdk/php/sdk/ existence..."
+          ls -la ~/selling-partner-api-sdk/php/
+          ls -la ~/selling-partner-api-sdk/php/sdk/ || echo "ERROR: ~/selling-partner-api-sdk/php/sdk/ does not exist!"
 
-      - name: Sync `php/sdk/` to Target Repo
+      - name: Ensure target-repo is Clean Before Sync
         run: |
-          rsync -av --delete php/sdk/ ~/workspace/target-repo/
+          echo "Cleaning target-repo before sync..."
+          rm -rf ~/workspace/target-repo/*
+          ls -la ~/workspace/target-repo/
+
+      - name: Fully Sync php/sdk/ to Target Repo
+        run: |
+          echo "Syncing ~/selling-partner-api-sdk/php/sdk/ to ~/workspace/target-repo/..."
+          rsync -av --delete --force ~/selling-partner-api-sdk/php/sdk/ ~/workspace/target-repo/
+          echo "Sync complete. Checking target-repo/"
+          ls -la ~/workspace/target-repo/
 
       - name: Commit and Push Changes
         run: |
           cd ~/workspace/target-repo
+          git config user.email "tomliked@amazon.co.jp"
+          git config user.name "tomliked"
+          BRANCH_NAME="sync-sdk-${{ env.SDK_VERSION }}-$(date +%Y%m%d-%H%M%S)"
+          git checkout -b "$BRANCH_NAME"
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+          
           git add -A
           git commit -m "Sync PHP SDK - Version ${{ env.SDK_VERSION }}" || echo "No changes to commit"
-          git push origin "$(git branch --show-current)"
+          git push origin "$BRANCH_NAME"
 
       - name: Create a Pull Request
         id: create_pr
