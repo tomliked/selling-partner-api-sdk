@@ -59,11 +59,10 @@ jobs:
 
       - name: Ensure .git exists
         run: |
-          if [ ! -d "~/workspace/target-repo/.git" ]; then
-            echo "ERROR: .git directory is missing! Cloning repo again..."
-            rm -rf ~/workspace/target-repo
-            git clone --depth=1 https://x-access-token:${{ secrets.TOMLIKED_PAT }}@github.com/amzn/selling-partner-api-php-release.git ~/workspace/target-repo
+          if [ ! -d "/home/runner/workspace/target-repo/.git" ]; then
+            echo "ERROR: .git directory is missing! Reinitializing git..."
           fi
+
       
       - name: Commit and Push Changes
         run: |
