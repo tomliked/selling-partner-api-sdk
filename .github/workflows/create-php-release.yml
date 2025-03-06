@@ -71,4 +71,10 @@ jobs:
                        --head "${{ env.BRANCH_NAME }}" --base "main"
         env:
           GH_TOKEN: ${{ secrets.TOMLIKED_PAT }}
+
+      - name: Enable Auto Merge for PR
+        run: |
+          gh pr merge --auto --merge --repo amzn/selling-partner-api-php-release ${{ steps.create_pr.outputs.pull-request-number }}
+        env:
+          GH_TOKEN: ${{ secrets.TOMLIKED_PAT }}
       
