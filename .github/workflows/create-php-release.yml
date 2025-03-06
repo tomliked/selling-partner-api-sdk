@@ -34,13 +34,13 @@ jobs:
       - name: Debug Check target-repo
         run: |
           echo "Checking if target-repo exists..."
-          ls -la ~/workspace/
-          if [ ! -d "~/workspace/target-repo" ]; then
+          ls -la ${HOME}/workspace/
+          if [ ! -d "${HOME}/workspace/target-repo" ]; then
             echo "ERROR: target-repo does not exist!"
             exit 1
           fi
-          ls -la ~/workspace/target-repo
-          ls -la ~/workspace/target-repo/.git || { echo "ERROR: .git directory is missing!"; exit 1; }
+          ls -la ${HOME}/workspace/target-repo
+          ls -la ${HOME}/workspace/target-repo/.git || { echo "ERROR: .git directory is missing!"; exit 1; }
 
       - name: Sync 'php/sdk/' to Target Repo
         run: |
