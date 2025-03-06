@@ -52,6 +52,7 @@ jobs:
 
       - name: Publish GitHub Release
         run: |
+          cd ~/workspace/target-repo
           gh release create "${{ env.TAG_NAME }}" \
             --title "SDK Release ${{ env.SDK_VERSION }}" \
             --notes "This release includes the latest sync from \`selling-partner-api-sdk/php/sdk/\`."
