@@ -31,6 +31,13 @@ jobs:
           submodules: true
           path: selling-partner-api-sdk
 
+      - name: Clone Target Repository (selling-partner-api-php-release)
+        run: |
+          mkdir -p ~/workspace
+          cd ~/workspace
+          echo "Cloning selling-partner-api-php-release..."
+          git clone --depth=1 https://x-access-token:${{ secrets.TOMLIKED_PAT }}@github.com/amzn/selling-partner-api-php-release.git target-repo || { echo "Git clone failed"; exit 1; }
+
       - name: Create a Release Tag
         run: |
           cd ~/workspace/target-repo
