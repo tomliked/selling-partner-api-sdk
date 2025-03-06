@@ -83,4 +83,24 @@ jobs:
           gh pr merge --auto --merge "${{ env.PULL_REQUEST_URL }}"
         env:
           GH_TOKEN: ${{ secrets.TOMLIKED_PAT }}
+
+      - name: Create a Release Tag
+        run: |
+          cd ~/workspace/target-repo
+          git fetch origin main
+          git checkout main
+          TAG_NAME="${{ env.SDK_VERSION }}"
+          git tag "$TAG_NAME"
+          git push origin "$TAG_NAME"
+          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ secrets.TOMLIKED_PAT }}
+
+      - name: Publish GitHub Release
+        run: |
+          gh release create "${{ env.TAG_NAME }}" \
+            --title "SDK Release ${{ env.SDK_VERSION }}" \
+            --notes "This release includes the latest sync from \`selling-partner-api-sdk/php/sdk/\`."
+        env:
+          GH_TOKEN: ${{ secrets.TOMLIKED_PAT }}
       
