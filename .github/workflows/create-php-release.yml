@@ -66,17 +66,21 @@ jobs:
           cd ~/workspace/target-repo
           echo "Current directory: $(pwd)"
           git status || { echo "ERROR: Not in a Git repository!"; exit 1; }
-          PR_URL=$(gh pr create --title "Sync PHP SDK - Version ${{ env.SDK_VERSION }}" \
-                                --body "This PR syncs the latest changes from \`selling-partner-api-sdk/php/sdk/\` to \`selling-partner-api-php-release/\`." \
-                                --head "${{ env.BRANCH_NAME }}" --base "main" --json url --jq '.url')
+      
+          gh pr create --title "Sync PHP SDK - Version ${{ env.SDK_VERSION }}" \
+                       --body "This PR syncs the latest changes from \`selling-partner-api-sdk/php/sdk/\` to \`selling-partner-api-php-release/\`." \
+                       --head "${{ env.BRANCH_NAME }}" --base "main"
+      
+          PR_URL=$(gh pr view "${{ env.BRANCH_NAME }}" --json url --jq '.url')
           echo "Pull Request Created: $PR_URL"
           echo "PULL_REQUEST_URL=$PR_URL" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ secrets.TOMLIKED_PAT }}
-
+      
       - name: Enable Auto Merge for PR
         run: |
           echo "Merging PR: ${{ env.PULL_REQUEST_URL }}"
           gh pr merge --auto --merge "${{ env.PULL_REQUEST_URL }}"
         env:
           GH_TOKEN: ${{ secrets.TOMLIKED_PAT }}
+      
