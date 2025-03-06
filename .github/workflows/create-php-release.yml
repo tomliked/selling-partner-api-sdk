@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: clone
     steps:
-      - name: Debug: Check `target-repo`
+      - name: Debug Check target-repo
         run: |
           if [ ! -d "~/workspace/target-repo" ]; then
             echo "ERROR: target-repo does not exist!"
