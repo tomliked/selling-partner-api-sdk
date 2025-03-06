@@ -45,13 +45,13 @@ jobs:
           ls -la ~/selling-partner-api-sdk/php/
           ls -la ~/selling-partner-api-sdk/php/sdk/ || echo "ERROR: ~/selling-partner-api-sdk/php/sdk/ does not exist!"
 
-      - name: Ensure 'target-repo/' is Clean Before Sync
+      - name: Ensure target-repo/ is Clean Before Sync
         run: |
           echo "Cleaning target-repo before sync..."
           rm -rf ~/workspace/target-repo/*
           ls -la ~/workspace/target-repo/
 
-      - name: Fully Sync 'php/sdk/' to Target Repo
+      - name: Fully Sync php/sdk/ to Target Repo
         run: |
           echo "Syncing ~/selling-partner-api-sdk/php/sdk/ to ~/workspace/target-repo/..."
           rsync -av --delete --force ~/selling-partner-api-sdk/php/sdk/ ~/workspace/target-repo/
