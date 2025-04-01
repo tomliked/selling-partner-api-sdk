@@ -17,7 +17,7 @@ If you are already registered successfully, you can find instructions on how to 
 
 ### Minimum Requirements
 
-To run the SDK you need PHP 7.4 or higher.
+To run the SDK you need PHP 8.1 or higher.
 
 
 ### Manual Installation
