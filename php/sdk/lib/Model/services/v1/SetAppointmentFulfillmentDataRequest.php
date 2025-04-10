@@ -60,6 +60,7 @@ class SetAppointmentFulfillmentDataRequest implements ModelInterface, ArrayAcces
       * @var string[]
       */
     protected static array $openAPITypes = [
+             'estimated_arrival_time' => '\SpApi\Model\services\v1\DateTimeRange',
              'fulfillment_time' => '\SpApi\Model\services\v1\FulfillmentTime',
              'appointment_resources' => '\SpApi\Model\services\v1\AppointmentResource[]',
              'fulfillment_documents' => '\SpApi\Model\services\v1\FulfillmentDocument[]'    ];
@@ -72,6 +73,7 @@ class SetAppointmentFulfillmentDataRequest implements ModelInterface, ArrayAcces
       * @psalm-var array<string, string|null>
       */
     protected static array $openAPIFormats = [
+            'estimated_arrival_time' => null,
             'fulfillment_time' => null,
             'appointment_resources' => null,
             'fulfillment_documents' => null    ];
@@ -82,6 +84,7 @@ class SetAppointmentFulfillmentDataRequest implements ModelInterface, ArrayAcces
       * @var boolean[]
       */
     protected static array $openAPINullables = [
+        'estimated_arrival_time' => true,
         'fulfillment_time' => true,
         'appointment_resources' => true,
         'fulfillment_documents' => true
@@ -173,7 +176,8 @@ class SetAppointmentFulfillmentDataRequest implements ModelInterface, ArrayAcces
      * @var string[]
      */
     protected static array $attributeMap = [
-        'fulfillment_time' => 'fulfillmentTime',
+        'estimated_arrival_time' => 'estimatedArrivalTime',
+                'fulfillment_time' => 'fulfillmentTime',
                 'appointment_resources' => 'appointmentResources',
                 'fulfillment_documents' => 'fulfillmentDocuments'
         
@@ -185,6 +189,7 @@ class SetAppointmentFulfillmentDataRequest implements ModelInterface, ArrayAcces
      * @var string[]
      */
     protected static array $setters = [
+        'estimated_arrival_time' => 'setEstimatedArrivalTime',
         'fulfillment_time' => 'setFulfillmentTime',
         'appointment_resources' => 'setAppointmentResources',
         'fulfillment_documents' => 'setFulfillmentDocuments'
@@ -196,6 +201,7 @@ class SetAppointmentFulfillmentDataRequest implements ModelInterface, ArrayAcces
      * @var string[]
      */
     protected static array $getters = [
+        'estimated_arrival_time' => 'getEstimatedArrivalTime',
         'fulfillment_time' => 'getFulfillmentTime',
         'appointment_resources' => 'getAppointmentResources',
         'fulfillment_documents' => 'getFulfillmentDocuments'
@@ -258,6 +264,7 @@ class SetAppointmentFulfillmentDataRequest implements ModelInterface, ArrayAcces
      */
     public function __construct(?array $data = null)
     {
+        $this->setIfExists('estimated_arrival_time', $data ?? [], null);
         $this->setIfExists('fulfillment_time', $data ?? [], null);
         $this->setIfExists('appointment_resources', $data ?? [], null);
         $this->setIfExists('fulfillment_documents', $data ?? [], null);
@@ -304,6 +311,40 @@ class SetAppointmentFulfillmentDataRequest implements ModelInterface, ArrayAcces
         return count($this->listInvalidProperties()) === 0;
     }
 
+
+    /**
+     * Gets estimated_arrival_time
+     *
+     * @return \SpApi\Model\services\v1\DateTimeRange|null
+     */
+    public function getEstimatedArrivalTime(): ?\SpApi\Model\services\v1\DateTimeRange
+    {
+        return $this->container['estimated_arrival_time'];
+    }
+
+    /**
+     * Sets estimated_arrival_time
+     *
+     * @param \SpApi\Model\services\v1\DateTimeRange|null $estimated_arrival_time estimated_arrival_time
+     *
+     * @return self
+     */
+    public function setEstimatedArrivalTime(?\SpApi\Model\services\v1\DateTimeRange $estimated_arrival_time): self
+    {
+        if (is_null($estimated_arrival_time)) {
+            array_push($this->openAPINullablesSetToNull, 'estimated_arrival_time');
+        } else {
+            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
+            $index = array_search('estimated_arrival_time', $nullablesSetToNull);
+            if ($index !== false) {
+                unset($nullablesSetToNull[$index]);
+                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
+            }
+        }
+        $this->container['estimated_arrival_time'] = $estimated_arrival_time;
+
+        return $this;
+    }
 
     /**
      * Gets fulfillment_time
